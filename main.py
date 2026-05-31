@@ -23,7 +23,6 @@ def reply_handler(update, context):
     if user_text in ["hi", "hello", "ဟိုင်း", "hey"]:
         update.message.reply_text(get_welcome_text(), parse_mode="Markdown")
 
-    # ဒီနေရာမှာ 'pay' လို့ ပို့တာနဲ့ အကြောင်းပြန်ပေးမှာပါ
     elif "pay" in user_text or "kpay" in user_text or "wave" in user_text:
         msg = (
             "💳 **Payment Accounts**\n\n"
@@ -77,4 +76,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-        
+    
