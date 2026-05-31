@@ -1,79 +1,51 @@
-import os
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, MessageHandler, Filters, CommandHandler
+import asyncio
+from telethon import TelegramClient, events
 
-# --- ၁။ BOT TOKEN ---
-BOT_TOKEN = "8887525878:AAEq54_d9jcJUhuaJ4AWrgMla1U9kKqMMQ4" 
+# --- အစ်ကို့ရဲ့ API Data များ ---
+api_id = 32505104
+api_hash = 'de1c0a908f2c18ee6532c900ec48f615'
 
-# --- ၂။ မက်ဆေ့ခ်ျများ ပြင်ဆင်ရန်နေရာ ---
-def get_welcome_text():
-    return (
-        "👋 **AERO Gaming Store မှ လှိုက်လှဲစွာ ကြိုဆိုပါတယ်ဗျာ!** 🎮\n\n"
-        "အခုအချိန်မှာ Admin အပြင်ရောက်နေလို့ Bot မှ အလိုအလျောက် အကြောင်းပြန်ပေးထားပါတယ်ခင်ဗျာ။\n"
-        "မိမိသိရှိလိုသည့် အချက်အလက်များကို အောက်ပါ Keyword များရိုက်၍ မေးမြန်းနိုင်ပါတယ် -\n\n"
-        "👉 **pay** - ငွေလွှဲအကောင့်များ သိရန်\n"
-        "👉 **time** - အော်ဒါတင်ရမည့် အချိန်နှင့် ဖြည့်ပေးမည့်အချိန် သိရန်\n"
-        "👉 **price** သို့မဟုတ် **ဈေး** - Diamond ဈေးနှုန်းများ သိရန်\n"
-        "👉 **link** - မင်မင်ရဲ့ Channel နှင့် Group Link များ သိရန်"
-    )
+client = TelegramClient('aero_session', api_id, api_hash)
 
-def reply_handler(update, context):
-    user_text = update.message.text.lower().strip()
-    
-    if user_text in ["hi", "hello", "ဟိုင်း", "hey"]:
-        update.message.reply_text(get_welcome_text(), parse_mode="Markdown")
+@client.on(events.NewMessage)
+async def handler(event):
+    if event.is_private:
+        text = event.raw_text.lower()
+        
+        # --- ကြိုဆိုစကား ---
+        if any(x in text for x in ["hi", "hello", "ဟိုင်း", "start"]):
+            await event.respond(
+                "👋 **AERO Gaming Store မှ လှိုက်လှဲစွာ ကြိုဆိုပါတယ်ဗျာ!** 🎮\n\n"
+                "Admin အပြင်ရောက်နေလို့ Bot မှ အလိုအလျောက် အကြောင်းပြန်ပေးထားပါတယ်ခင်ဗျာ။\n\n"
+                "👉 **pay** - ငွေလွှဲအကောင့်များ\n"
+                "👉 **time** - အော်ဒါတင်ခြင်းနှင့် ဖြည့်ပေးမည့်အချိန်\n"
+                "👉 **price** - Diamond ဈေးနှုန်းများ\n"
+                "👉 **link** - Channel/Group Link များ"
+            )
+            
+        # --- Pay အကြောင်း ---
+        elif "pay" in text or "kpay" in text:
+            await event.respond("💳 **Payment:** 09799747004 (Khant Min Hein)\nငွေလွှဲပြီးလျှင် ပြေစာ ပို့ပေးပါရန်။")
 
-    elif "pay" in user_text or "kpay" in user_text or "wave" in user_text:
-        msg = (
-            "💳 **Payment Accounts**\n\n"
-            "* Pay Number: `09799747004`\n\n"
-            "*(Account Name: Khant Min Hein)*\n\n"
-            "⚠️ *အရေးကြီးချက်:* ငွေလွှဲပြီးပါက ပြေစာ (Screenshot) ကို Group ထဲသို့ တိကျစွာ ပို့ပေးပါရန်။"
-        )
-        update.message.reply_text(msg, parse_mode="Markdown")
+        # --- အော်ဒါတင်ခြင်းနှင့် အချိန်အကြောင်း ---
+        elif "time" in text or "အချိန်" in text:
+            await event.respond(
+                "⏳ **Order Time Schedule**\n\n"
+                "✅ **အော်ဒါတင်ခြင်း:** ဝယ်ယူလိုသူများအနေဖြင့် အော်ဒါများကို **၂၄ နာရီပတ်လုံး** အချိန်မရွေး တင်ထားနိုင်ပါသည်။\n"
+                "⏰ **အော်ဒါဖြည့်ခြင်း:** တင်ထားသော အော်ဒါများကို **ညနေ ၆ နာရီမှ ၁၀ နာရီအတွင်း** အစဉ်လိုက် ဖြည့်ပေးသွားပါမည်။"
+            )
 
-    elif "time" in user_text or "အချိန်" in user_text or "order" in user_text:
-        msg = (
-            "⏳ **Order Time Schedule**\n\n"
-            "✅ **အော်ဒါတင်ခြင်း:** ဝယ်ယူလိုသူများအနေဖြင့် အော်ဒါများကို **၂၄ နာရီပတ်လုံး အချိန်မရွေး** တင်ထားနိုင်ပါသည်။\n"
-            "⏰ **အော်ဒါဖြည့်ခြင်း:** တင်ထားသော အော်ဒါများကို **ညနေ ၆ နာရီမှ ၁၀ နာရီအတွင်း** အစဉ်လိုက် ဖြည့်ပေးသွားမည်ဖြစ်ပါသည်။"
-        )
-        update.message.reply_text(msg, parse_mode="Markdown")
+        # --- ဈေးနှုန်းအကြောင်း ---
+        elif "price" in text or "ဈေး" in text:
+            await event.respond("💰 **ဈေးနှုန်းများ:** Group Pinned Message 📌 တွင် ကြည့်ရှုနိုင်ပါသည်။")
 
-    elif "price" in user_text or "ဈေး" in user_text:
-        msg = (
-            "💰 **Diamond ဈေးနှုန်းများ သိရှိရန်**\n\n"
-            "ယနေ့ Diamond ဈေးနှုန်းများကို မင်မင်ရဲ့ **Official Group** ၏ ထိပ်ဆုံးရှိ **Pinned Message** 📌 တွင် အမြဲတမ်း Update ပြုလုပ်ပေးထားပါသည်ခင်ဗျာ။\n\n"
-            "ဈေးနှုန်းများကို အောက်ပါ Link မှတစ်ဆင့် ဝင်ရောက်ကြည့်ရှုနိုင်ပါသည် -\n"
-            "👉 [AERO Gaming Group Pinned Message](https://t.me/aerogamingstoregp21/1)"
-        )
-        update.message.reply_text(msg, parse_mode="Markdown", disable_web_page_preview=False)
+        # --- လင့်များ ---
+        elif "link" in text:
+            await event.respond("🔗 **Channel:** https://t.me/Aerogamingstore21\n💬 **Group:** https://t.me/aerogamingstoregp21")
 
-    elif "link" in user_text or "လင့်" in user_text or "join" in user_text:
-        keyboard = [
-            [InlineKeyboardButton("📢 Join Our Channel", url="https://t.me/Aerogamingstore21")],
-            [InlineKeyboardButton("💬 Join Our Group", url="https://t.me/aerogamingstoregp21")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        update.message.reply_text(
-            "🔗 **AERO Gaming Store ရဲ့ Official Links များ**\n\nChannel ကို Join ထားပြီး Group ထဲမှာ အော်ဒါတင်နိုင်ပါတယ်ဗျာ -", 
-            reply_markup=reply_markup,
-            parse_mode="Markdown"
-        )
-    else:
-        return
+async def main():
+    await client.start()
+    print("Bot is running...")
+    await client.run_until_disconnected()
 
-def start_command(update, context):
-    update.message.reply_text(get_welcome_text(), parse_mode="Markdown")
-
-def main():
-    updater = Updater(BOT_TOKEN, use_context=True)
-    dp = updater.dispatcher
-    dp.add_handler(CommandHandler("start", start_command))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, reply_handler))
-    updater.start_polling()
-    updater.idle()
-
-if __name__ == "__main__":
-    main()
-    
+asyncio.run(main())
