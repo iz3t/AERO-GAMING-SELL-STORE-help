@@ -1,12 +1,27 @@
+from flask import Flask
+from threading import Thread
 import asyncio
 from telethon import TelegramClient, events
 
-# --- အစ်ကို့ရဲ့ API Data များ ---
+# --- 1. Web Server လေး ထည့်ပေးလိုက်တာပါ (Render အတွက်) ---
+app = Flask('')
+@app.route('/')
+def home():
+    return "AERO Bot is running!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+t = Thread(target=run)
+t.start()
+
+# --- 2. အစ်ကို့ရဲ့ Telegram API Data များ ---
 api_id = 32505104
 api_hash = 'de1c0a908f2c18ee6532c900ec48f615'
 
 client = TelegramClient('aero_session', api_id, api_hash)
 
+# --- 3. အလိုအလျောက် စာပြန်ပေးမည့် စနစ် ---
 @client.on(events.NewMessage)
 async def handler(event):
     if event.is_private:
@@ -43,6 +58,7 @@ async def handler(event):
         elif "link" in text:
             await event.respond("🔗 **Channel:** https://t.me/Aerogamingstore21\n💬 **Group:** https://t.me/aerogamingstoregp21")
 
+# --- 4. Bot စတင်ခြင်း ---
 async def main():
     await client.start()
     print("Bot is running...")
