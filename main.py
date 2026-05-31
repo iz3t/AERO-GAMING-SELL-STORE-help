@@ -11,7 +11,7 @@ def get_welcome_text():
         "👋 **AERO Gaming Store မှ လှိုက်လှဲစွာ ကြိုဆိုပါတယ်ဗျာ!** 🎮\n\n"
         "အခုအချိန်မှာ Admin အပြင်ရောက်နေလို့ Bot မှ အလိုအလျောက် အကြောင်းပြန်ပေးထားပါတယ်ခင်ဗျာ။\n"
         "မိမိသိရှိလိုသည့် အချက်အလက်များကို အောက်ပါ Keyword များရိုက်၍ မေးမြန်းနိုင်ပါတယ် -\n\n"
-        "👉 **kpay** သို့မဟုတ် **wave** - ငွေလွှဲအကောင့်များ သိရန်\n"
+        "👉 **pay** - ငွေလွှဲအကောင့်များ သိရန်\n"
         "👉 **time** - အော်ဒါတင်ရမည့် အချိန်နှင့် ဖြည့်ပေးမည့်အချိန် သိရန်\n"
         "👉 **price** သို့မဟုတ် **ဈေး** - Diamond ဈေးနှုန်းများ သိရန်\n"
         "👉 **link** - မင်မင်ရဲ့ Channel နှင့် Group Link များ သိရန်"
@@ -20,22 +20,19 @@ def get_welcome_text():
 def reply_handler(update, context):
     user_text = update.message.text.lower().strip()
     
-    # (က) ဝယ်သူက hi / hello / ဟိုင်း လို့ ပို့မှ ပြန်မည့်အပိုင်း
     if user_text in ["hi", "hello", "ဟိုင်း", "hey"]:
         update.message.reply_text(get_welcome_text(), parse_mode="Markdown")
 
-    # (ခ) KPay / WavePay ပုံစံ
-    elif "kpay" in user_text or "wave" in user_text or "pay" in user_text:
+    # ဒီနေရာမှာ 'pay' လို့ ပို့တာနဲ့ အကြောင်းပြန်ပေးမှာပါ
+    elif "pay" in user_text or "kpay" in user_text or "wave" in user_text:
         msg = (
             "💳 **Payment Accounts**\n\n"
-            "* KPay: `09799747004`\n"
-            "* WavePay: `09799747004`\n\n"
+            "* Pay Number: `09799747004`\n\n"
             "*(Account Name: Khant Min Hein)*\n\n"
             "⚠️ *အရေးကြီးချက်:* ငွေလွှဲပြီးပါက ပြေစာ (Screenshot) ကို Group ထဲသို့ တိကျစွာ ပို့ပေးပါရန်။"
         )
         update.message.reply_text(msg, parse_mode="Markdown")
 
-    # (ဂ) အော်ဒါတင်ချိန် / ဖြည့်ချိန်
     elif "time" in user_text or "အချိန်" in user_text or "order" in user_text:
         msg = (
             "⏳ **Order Time Schedule**\n\n"
@@ -44,7 +41,6 @@ def reply_handler(update, context):
         )
         update.message.reply_text(msg, parse_mode="Markdown")
 
-    # (ဃ) ဈေးနှုန်းမေးမြန်းခြင်း
     elif "price" in user_text or "ဈေး" in user_text:
         msg = (
             "💰 **Diamond ဈေးနှုန်းများ သိရှိရန်**\n\n"
@@ -54,7 +50,6 @@ def reply_handler(update, context):
         )
         update.message.reply_text(msg, parse_mode="Markdown", disable_web_page_preview=False)
 
-    # (င) Channel / Group Links
     elif "link" in user_text or "လင့်" in user_text or "join" in user_text:
         keyboard = [
             [InlineKeyboardButton("📢 Join Our Channel", url="https://t.me/Aerogamingstore21")],
@@ -66,8 +61,6 @@ def reply_handler(update, context):
             reply_markup=reply_markup,
             parse_mode="Markdown"
         )
-
-    # (စ) Keyword မဟုတ်လျှင် ပြန်မဖြေပါ
     else:
         return
 
@@ -77,13 +70,11 @@ def start_command(update, context):
 def main():
     updater = Updater(BOT_TOKEN, use_context=True)
     dp = updater.dispatcher
-    
     dp.add_handler(CommandHandler("start", start_command))
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, reply_handler))
-    
     updater.start_polling()
     updater.idle()
 
 if __name__ == "__main__":
     main()
-
+        
